@@ -55,7 +55,7 @@ const Grid = styled.div`
   width: 100%;
 `;
 
-const ShowAllButton = styled.button`
+const ShowAllButton = styled.a`
   display: block;
   margin: 0 auto;
   padding: 12px 24px;
@@ -66,6 +66,7 @@ const ShowAllButton = styled.button`
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.2s;
+  text-decoration: none;
 
   &:hover {
     background-color: #0056b3;
@@ -73,7 +74,13 @@ const ShowAllButton = styled.button`
 `;
 
 function App() {
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll] = useState(location.hash === "#all");
+
+  useEffect(() => {
+    const listener = () => setShowAll(location.hash === "#all");
+    window.addEventListener("hashchange", listener);
+    return () => window.removeEventListener("hashchange", listener);
+  }, []);
 
   // subscribe to relays
   useEffect(() => {
@@ -134,9 +141,7 @@ function App() {
         )) ?? <p>Loading...</p>}
       </Grid>
       {sites && sites.length > 4 && !showAll && (
-        <ShowAllButton onClick={() => setShowAll(true)}>
-          Show All Sites
-        </ShowAllButton>
+        <ShowAllButton href="#all">Show All Sites</ShowAllButton>
       )}
     </Container>
   );
