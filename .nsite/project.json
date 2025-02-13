@@ -1,0 +1,12 @@
+{
+  "relays": [
+    "wss://nostrue.com",
+    "wss://relay.damus.io",
+    "wss://ae.purplerelay.com"
+  ],
+  "servers": [
+    "https://nostr.download",
+    "https://cdn.hzrd149.com",
+    "https://blossom.primal.net"
+  ]
+}
