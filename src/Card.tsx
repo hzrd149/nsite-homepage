@@ -14,19 +14,17 @@ const Card = styled.a`
 
   /* box styles */
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
   padding: 0.5em;
-  background: white;
+  background: var(--card-background);
   transition: transform 0.2s;
   cursor: pointer;
+  color: var(--text);
+  text-decoration: none;
 
   &:hover {
     transform: translateY(-4px);
   }
-
-  /* remove default styles */
-  color: initial;
-  text-decoration: none;
 `;
 
 const Avatar = styled.img`
@@ -47,12 +45,12 @@ const Profile = styled.div`
 
 const Title = styled.h3`
   margin: 12px 0 8px;
-  color: #333;
+  color: var(--text);
   margin: 0;
 `;
 
 const Description = styled.p`
-  color: #666;
+  color: var(--secondary);
   font-size: 14px;
   line-height: 1.4;
   margin: 0;
@@ -62,7 +60,7 @@ const Updated = styled.div`
   margin-top: auto;
   font-size: 0.6em;
   font-style: italic;
-  color: gray;
+  color: var(--secondary);
 `;
 
 export default function SiteCard({ site }: { site: NostrEvent }) {
