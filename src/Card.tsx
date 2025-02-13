@@ -1,9 +1,9 @@
+import { useEffect } from "react";
 import styled from "@emotion/styled";
 import { ProfileQuery } from "applesauce-core/queries/profile";
 import { useStoreQuery } from "applesauce-react/hooks/use-store-query";
 import { type NostrEvent } from "nostr-tools";
 import { npubEncode } from "nostr-tools/nip19";
-import { useEffect } from "react";
 import { replaceableLoader } from "./nostr";
 
 const Card = styled.a`
