@@ -1,4 +1,4 @@
-import { type Nip07Interface } from "applesauce-signer";
+import { type Nip07Interface } from "applesauce-signers";
 
 declare global {
   interface Window {

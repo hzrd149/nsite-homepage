@@ -15,17 +15,17 @@ importers:
         specifier: ^11.14.0
         version: 11.14.0(@emotion/react@11.14.0(@types/react@18.3.18)(react@18.3.1))(@types/react@18.3.18)(react@18.3.1)
       applesauce-core:
-        specifier: ^0.10.0
-        version: 0.10.0(typescript@5.6.3)
+        specifier: ^0.11.0
+        version: 0.11.0(typescript@5.6.3)
       applesauce-loaders:
-        specifier: ^0.10.0
-        version: 0.10.0(typescript@5.6.3)
+        specifier: ^0.11.0
+        version: 0.11.0(typescript@5.6.3)
       applesauce-react:
-        specifier: ^0.10.0
-        version: 0.10.0(typescript@5.6.3)
-      applesauce-signer:
-        specifier: ^0.10.0
-        version: 0.10.0(typescript@5.6.3)
+        specifier: ^0.11.0
+        version: 0.11.0(react-dom@18.3.1(react@18.3.1))(typescript@5.6.3)
+      applesauce-signers:
+        specifier: ^0.11.0
+        version: 0.11.0(typescript@5.6.3)
       nostr-idb:
         specifier: ^2.2.0
         version: 2.2.0(typescript@5.6.3)
@@ -560,9 +560,6 @@ packages:
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
 
-  '@types/dom-serial@1.0.6':
-    resolution: {integrity: sha512-eUHKbc6mdMgMm75/oBLocs3wkOQkPQ/oNCT+b5OgUT6mLgIvDTp3wCCE9tYZNvDPPh6Cj9lVg2IguWfS/mDrrQ==}
-
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
@@ -597,27 +594,26 @@ packages:
     peerDependencies:
       vite: ^4 || ^5 || ^6
 
-  applesauce-content@0.10.0:
-    resolution: {integrity: sha512-N2cmlDxUBV8v5gIG+zUJwptMID/+KtRsfmypO02Ila44uv0f7lxyIwlG/ft2YGMoL+cC6NMuXS2gwPTlqwGGww==}
+  applesauce-accounts@0.11.0:
+    resolution: {integrity: sha512-U+A5+8TL+PJgBA38Z6nOVTQenViJW5A/yt7dgWyPno2f7uoEpFUPfoaTGtZb+ygDFWCExzR5ofbhMv1pOW2h+Q==}
 
-  applesauce-core@0.10.0:
-    resolution: {integrity: sha512-QMhUh4FIARcqY5soCB4Z8DIu+py0rYb28IgWT4gP9DLBGpDrY8lStXk7W1/46TLjEH97y0hbiXFK7kMCZ31oOQ==}
+  applesauce-content@0.11.0:
+    resolution: {integrity: sha512-4TCMm5hn8kL9Z5PWTdTt95XHzkYBWvh+KOLtQvB3rb6IG4yrM3NINavn6WM0q+9/O13aA71g1PIuBStd+FYFUw==}
 
-  applesauce-factory@0.10.0:
-    resolution: {integrity: sha512-KYgoLyTPr82cYf3yICt+QxPygdpaicxmKSBertCTqc2smOoF4LI14VEb0io+8+fjnnIQ/iJ6FxX+FqOPc51H2w==}
+  applesauce-core@0.11.0:
+    resolution: {integrity: sha512-HVe0bdyler1aVE2ifUYBeV+ze21gUE19gLsuZPnYByP5UKqPP/Xgck6j++r2kdGzVGnzv9N4OYSh/Gycs2OxtA==}
 
-  applesauce-loaders@0.10.0:
-    resolution: {integrity: sha512-cEPV8nSJKfmvVVRaSDc/3TRaDE8s0CSFJGzEvSYBTjokZBvQz2QZrlQXbwTvYD90XrWFH1LJ8dLDDnEUehaOow==}
+  applesauce-factory@0.11.0:
+    resolution: {integrity: sha512-8zrd8PGjrXpZdCZgyOcn71n7LmttYjEDipJemKNihoZX/yIzF/l97OjX5lC0YT7DyJq5EYqgeCxP/Rf7O+qi8A==}
 
-  applesauce-net@0.10.0:
-    resolution: {integrity: sha512-ZsAs/MkeGHiPZ2/a8lwP8lx/Eh+5Dot0qG4BLTAqjg4emP/RsiqW+hyc6v6QcVbdvuR0+hP1gka3+wWtiy/cTA==}
+  applesauce-loaders@0.11.0:
+    resolution: {integrity: sha512-RG71L8hAQHxseNE6VxmlzPKvYWR8NPZzcv3v1zOG9dS/yKwVDZMiXAqvtMpp//jy+HcmH5zipZs+Cy9UX0mPCg==}
 
-  applesauce-react@0.10.0:
-    resolution: {integrity: sha512-du4EC4cBM9bWbyRVllciPCNwwwKTEsTqSjsB5/h/tktfG/2ubiZfUsDD9o55o0eWx/drDabIN4sjnv3OEwvXww==}
+  applesauce-react@0.11.0:
+    resolution: {integrity: sha512-DDf1Ac98lZ7dINWp6m00zS46/EM9y2AfcQUON4ULPH7fpfECyDuKtdgX53Hyd9qcZ1eGhbOTrwDom8g0KDOp2w==}
 
-  applesauce-signer@0.10.0:
-    resolution: {integrity: sha512-2Cn2ZUxk47cBJBFoUl9DB37mjgg8/8GwTAG7csPqtooJ4nUh0ylO4Gh1Mr/401Lc8tjZJvpVBySWpCeXrnG1rQ==}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+  applesauce-signers@0.11.0:
+    resolution: {integrity: sha512-z0Ge83AIRGpG6Vw924g2WvGp7qIIx6Iu+caaN6hFsqup+jRjnKhg0qsHOBp4buRpA/KsgyvXaMEFtGVMMtKF/Q==}
 
   babel-plugin-macros@3.1.0:
     resolution: {integrity: sha512-Cg7TFGpIr01vOQNODXOOaGz2NpCU5gl8x1qJFbb6hbZxR7XrcE2vtbAsTAbJ7/xwJtUuJEw8K8Zr/AE0LHlesg==}
@@ -871,6 +867,13 @@ packages:
 
   nostr-wasm@0.1.0:
     resolution: {integrity: sha512-78BTryCLcLYv96ONU8Ws3Q1JzjlAt+43pWQhIl86xZmWeegYCNLPml7yQ+gG3vR6V5h4XGj+TxO+SS5dsThQIA==}
+
+  observable-hooks@4.2.4:
+    resolution: {integrity: sha512-FdTQgyw1h5bG/QHCBIqctdBSnv9VARJCEilgpV6L2qlw1yeLqFIwPm4U15dMtl5kDmNN0hSt+Nl6iYbLFwEcQA==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+      rxjs: '>=6.0.0'
 
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
@@ -1458,8 +1461,6 @@ snapshots:
     dependencies:
       '@types/ms': 2.1.0
 
-  '@types/dom-serial@1.0.6': {}
-
   '@types/estree@1.0.6': {}
 
   '@types/hast@3.0.4':
@@ -1494,13 +1495,24 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  applesauce-content@0.10.0(typescript@5.6.3):
+  applesauce-accounts@0.11.0(typescript@5.6.3):
+    dependencies:
+      '@noble/hashes': 1.7.1
+      applesauce-signers: 0.11.0(typescript@5.6.3)
+      nanoid: 5.0.9
+      nostr-tools: 2.10.4(typescript@5.6.3)
+      rxjs: 7.8.1
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
+  applesauce-content@0.11.0(typescript@5.6.3):
     dependencies:
       '@cashu/cashu-ts': 2.0.0-rc1
       '@types/hast': 3.0.4
       '@types/mdast': 4.0.4
       '@types/unist': 3.0.3
-      applesauce-core: 0.10.0(typescript@5.6.3)
+      applesauce-core: 0.11.0(typescript@5.6.3)
       mdast-util-find-and-replace: 3.0.2
       nostr-tools: 2.10.4(typescript@5.6.3)
       remark: 15.0.1
@@ -1511,7 +1523,7 @@ snapshots:
       - supports-color
       - typescript
 
-  applesauce-core@0.10.0(typescript@5.6.3):
+  applesauce-core@0.11.0(typescript@5.6.3):
     dependencies:
       '@scure/base': 1.2.4
       debug: 4.4.0
@@ -1525,18 +1537,19 @@ snapshots:
       - supports-color
       - typescript
 
-  applesauce-factory@0.10.0(typescript@5.6.3):
+  applesauce-factory@0.11.0(typescript@5.6.3):
     dependencies:
-      applesauce-content: 0.10.0(typescript@5.6.3)
-      applesauce-core: 0.10.0(typescript@5.6.3)
+      applesauce-content: 0.11.0(typescript@5.6.3)
+      applesauce-core: 0.11.0(typescript@5.6.3)
+      nanoid: 5.0.9
       nostr-tools: 2.10.4(typescript@5.6.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  applesauce-loaders@0.10.0(typescript@5.6.3):
+  applesauce-loaders@0.11.0(typescript@5.6.3):
     dependencies:
-      applesauce-core: 0.10.0(typescript@5.6.3)
+      applesauce-core: 0.11.0(typescript@5.6.3)
       nanoid: 5.0.9
       nostr-tools: 2.10.4(typescript@5.6.3)
       rx-nostr: 3.5.0
@@ -1545,36 +1558,27 @@ snapshots:
       - supports-color
       - typescript
 
-  applesauce-net@0.10.0(typescript@5.6.3):
+  applesauce-react@0.11.0(react-dom@18.3.1(react@18.3.1))(typescript@5.6.3):
     dependencies:
-      applesauce-core: 0.10.0(typescript@5.6.3)
-      nanoid: 5.0.9
+      applesauce-accounts: 0.11.0(typescript@5.6.3)
+      applesauce-content: 0.11.0(typescript@5.6.3)
+      applesauce-core: 0.11.0(typescript@5.6.3)
+      applesauce-factory: 0.11.0(typescript@5.6.3)
       nostr-tools: 2.10.4(typescript@5.6.3)
-      rxjs: 7.8.1
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
-
-  applesauce-react@0.10.0(typescript@5.6.3):
-    dependencies:
-      applesauce-content: 0.10.0(typescript@5.6.3)
-      applesauce-core: 0.10.0(typescript@5.6.3)
-      applesauce-factory: 0.10.0(typescript@5.6.3)
-      nostr-tools: 2.10.4(typescript@5.6.3)
+      observable-hooks: 4.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.1)
       react: 18.3.1
       rxjs: 7.8.1
     transitivePeerDependencies:
+      - react-dom
       - supports-color
       - typescript
 
-  applesauce-signer@0.10.0(typescript@5.6.3):
+  applesauce-signers@0.11.0(typescript@5.6.3):
     dependencies:
       '@noble/hashes': 1.7.1
       '@noble/secp256k1': 1.7.1
       '@scure/base': 1.2.4
-      '@types/dom-serial': 1.0.6
-      applesauce-core: 0.10.0(typescript@5.6.3)
-      applesauce-net: 0.10.0(typescript@5.6.3)
+      applesauce-core: 0.11.0(typescript@5.6.3)
       debug: 4.4.0
       nanoid: 5.0.9
       nostr-tools: 2.10.4(typescript@5.6.3)
@@ -1932,6 +1936,12 @@ snapshots:
 
   nostr-wasm@0.1.0:
     optional: true
+
+  observable-hooks@4.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      rxjs: 7.8.1
 
   parent-module@1.0.1:
     dependencies:
