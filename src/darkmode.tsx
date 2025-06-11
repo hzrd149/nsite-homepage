@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 
-const useDarkModeState = (): [boolean, React.Dispatch<React.SetStateAction<boolean>>] => {
+const useDarkModeState = (): [
+  boolean,
+  React.Dispatch<React.SetStateAction<boolean>>,
+] => {
   const [darkMode, setDarkMode] = useState(false);
 
   // Detect system dark mode preference and listen for changes

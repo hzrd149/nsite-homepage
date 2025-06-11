@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react";
 import { Global, css } from "@emotion/react";
-import { useStoreQuery } from "applesauce-react/hooks/use-store-query";
-import {
-  ReplaceableQuery,
-  TimelineQuery,
-} from "applesauce-core/queries/simple";
-import { getEventUID } from "applesauce-core/helpers/event";
-import { createRxForwardReq } from "rx-nostr";
 import styled from "@emotion/styled";
+import { mapEventsToStore } from "applesauce-core";
+import { getEventUID } from "applesauce-core/helpers/event";
+import { ReplaceableModel, TimelineModel } from "applesauce-core/models";
+import {
+  useEventModel,
+  useObservableMemo,
+  useObservableState,
+} from "applesauce-react/hooks";
+import { onlyEvents } from "applesauce-relay";
+import { useEffect, useState } from "react";
 
-import { FEATURED_SITES_LIST, NSITE_KIND } from "./const";
-import { eventStore, replaceableLoader, rxNostr } from "./nostr";
 import SiteCard from "./Card";
+import { FEATURED_SITES_LIST, NSITE_KIND } from "./const";
 import useDarkModeState from "./darkmode";
+import { addressLoader, eventStore, pool } from "./nostr";
+import { appRelays } from "./settings";
 
 // Define global CSS variables based on the dark mode flag
 const globalStyles = (darkMode: boolean) => css`
@@ -33,7 +36,9 @@ const globalStyles = (darkMode: boolean) => css`
     color: var(--text);
     margin: 0;
     padding: 0;
-    transition: background 0.2s, color 0.2s;
+    transition:
+      background 0.2s,
+      color 0.2s;
   }
 `;
 
@@ -114,6 +119,7 @@ const ThemeToggleButton = styled.button`
 function App() {
   const [showAll, setShowAll] = useState(location.hash === "#all");
   const [darkMode, setDarkMode] = useDarkModeState();
+  const relays = useObservableState(appRelays);
 
   useEffect(() => {
     const listener = () => setShowAll(location.hash === "#all");
@@ -122,38 +128,32 @@ function App() {
   }, []);
 
   // subscribe to relays
-  useEffect(() => {
-    const req = createRxForwardReq("sites");
-
-    // subscribe to request
-    const sub = rxNostr
-      .use(req)
-      .subscribe((p) => eventStore.add(p.event, p.from));
-
-    // set filter
-    req.emit({ kinds: [NSITE_KIND], "#d": ["/index.html"] });
-
-    return () => sub.unsubscribe();
-  }, []);
+  useObservableMemo(
+    () =>
+      pool
+        .subscription(relays, { kinds: [NSITE_KIND], "#d": ["/index.html"] })
+        .pipe(onlyEvents(), mapEventsToStore(eventStore)),
+    [relays],
+  );
 
   useEffect(() => {
-    replaceableLoader.next({ ...FEATURED_SITES_LIST, force: true });
+    addressLoader({ ...FEATURED_SITES_LIST }).subscribe();
   }, []);
-  const featuredList = useStoreQuery(ReplaceableQuery, [
+  const featuredList = useEventModel(ReplaceableModel, [
     FEATURED_SITES_LIST.kind,
     FEATURED_SITES_LIST.pubkey,
     FEATURED_SITES_LIST.identifier,
-  ]);
+  ]) as any;
 
   // get sites
-  const sites = useStoreQuery(TimelineQuery, [
+  const sites = useEventModel(TimelineModel, [
     { kinds: [NSITE_KIND], "#d": ["/index.html"] },
-  ]);
+  ]) as any;
 
   const featured =
     featuredList &&
-    sites?.filter((site) =>
-      featuredList.tags.some((t) => t[1] === site.pubkey),
+    sites?.filter((site: any) =>
+      featuredList.tags.some((t: any) => t[1] === site.pubkey),
     );
 
   return (
@@ -180,7 +180,7 @@ function App() {
         </About>
         <SitesHeader>{showAll ? "All" : "Featured"} sites</SitesHeader>
         <Grid>
-          {(showAll ? sites : featured)?.map((site) => (
+          {(showAll ? sites : featured)?.map((site: any) => (
             <SiteCard key={getEventUID(site)} site={site} />
           )) ?? <p>Loading...</p>}
         </Grid>

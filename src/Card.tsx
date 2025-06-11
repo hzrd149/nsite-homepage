@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import styled from "@emotion/styled";
-import { ProfileQuery } from "applesauce-core/queries/profile";
-import { useStoreQuery } from "applesauce-react/hooks/use-store-query";
+import { ProfileModel } from "applesauce-core/models";
+import { useEventModel } from "applesauce-react/hooks";
 import { type NostrEvent } from "nostr-tools";
 import { npubEncode } from "nostr-tools/nip19";
-import { replaceableLoader } from "./nostr";
+import { addressLoader } from "./nostr";
 
 const Card = styled.a`
   /* layout styles */
@@ -67,12 +67,12 @@ export default function SiteCard({ site }: { site: NostrEvent }) {
   const npub = npubEncode(site.pubkey);
   const url = new URL("/", `${location.protocol}//${npub}.${location.host}`);
 
-  const profile = useStoreQuery(ProfileQuery, [site.pubkey]);
+  const profile = useEventModel(ProfileModel, [site.pubkey]) as any;
   const picture = profile?.picture || profile?.image;
 
   // load profile
   useEffect(() => {
-    replaceableLoader.next({ pubkey: site.pubkey, kind: 0 });
+    addressLoader({ pubkey: site.pubkey, kind: 0 }).subscribe();
   }, [site]);
 
   return (

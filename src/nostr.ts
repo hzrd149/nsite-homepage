@@ -1,12 +1,10 @@
-import { Observable } from "rxjs";
 import { EventStore } from "applesauce-core/event-store";
-import { QueryStore } from "applesauce-core/query-store";
-import { ReplaceableLoader } from "applesauce-loaders/loaders/replaceable-loader";
 import { isFromCache } from "applesauce-core/helpers/event";
-import { openDB, getEventsForFilters, addEvents } from "nostr-idb";
-import { createRxNostr } from "rx-nostr";
-import { verifier } from "rx-nostr-crypto";
-import { NostrEvent } from "nostr-tools";
+import { createAddressLoader } from "applesauce-loaders/loaders";
+import { RelayPool } from "applesauce-relay";
+import { addEvents, getEventsForFilters, openDB } from "nostr-idb";
+import { Filter, NostrEvent, verifyEvent } from "nostr-tools";
+import { bufferTime, filter } from "rxjs";
 
 let nostrIdb:
   | Promise<ReturnType<typeof openDB>>
@@ -20,65 +18,34 @@ async function getNostrIdb() {
   return await nostrIdb;
 }
 
-export const rxNostr = createRxNostr({ verifier: verifier });
-rxNostr.setDefaultRelays([
-  "wss://nostrue.com",
-  "wss://relay.damus.io",
-  "wss://purplerelay.com",
-  "wss://nostr.wine",
-]);
+async function cacheRequest(filters: Filter[]) {
+  const db = await getNostrIdb();
+  return getEventsForFilters(db, filters);
+}
 
+export const pool = new RelayPool();
 export const eventStore = new EventStore();
-export const queryStore = new QueryStore(eventStore);
 
-export const replaceableLoader = new ReplaceableLoader(rxNostr, {
-  cacheRequest: (filters) => {
-    return new Observable((observer) => {
-      getNostrIdb().then(
-        (db) => {
-          getEventsForFilters(db, filters)
-            .then(
-              (events) => {
-                for (const event of events) observer.next(event);
-              },
-              (err) => observer.error(err),
-            )
-            .finally(() => observer.complete());
-        },
-        (err) => observer.error(err),
-      );
-    });
-  },
+eventStore.verifyEvent = verifyEvent;
+
+// Create functional address loader - using rxNostr as pool since it implements the required interface
+export const addressLoader = createAddressLoader(pool, {
+  eventStore,
+  cacheRequest,
 });
 
-replaceableLoader.subscribe((packet) =>
-  eventStore.add(packet.event, packet.from),
-);
-
 let queue: NostrEvent[] = [];
-eventStore.database.inserted.subscribe((event) => {
+eventStore.insert$.subscribe((event: NostrEvent) => {
   if (!isFromCache(event)) queue.push(event);
 });
 
-// add events to cache every second
-setInterval(() => {
-  if (queue.length === 0) return;
-
-  const events = Array.from(queue);
-  queue = [];
-  getNostrIdb().then((db) => addEvents(db, events));
-}, 1000);
-
-// get relays from extension
-if (window.nostr) {
-  async () => {
-    const relays = await window.nostr?.getRelays?.();
-
-    const urls = relays && Object.keys(relays);
-    if (urls && urls.length > 0)
-      rxNostr.setDefaultRelays([
-        ...Object.keys(rxNostr.getDefaultRelays()),
-        ...urls,
-      ]);
-  };
-}
+getNostrIdb().then((cache) => {
+  eventStore.insert$
+    .pipe(
+      bufferTime(1000),
+      filter((b) => b.length > 0),
+    )
+    .subscribe((events) => {
+      addEvents(cache, events);
+    });
+});
