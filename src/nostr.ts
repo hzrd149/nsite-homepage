@@ -5,6 +5,7 @@ import { RelayPool } from "applesauce-relay";
 import { addEvents, getEventsForFilters, openDB } from "nostr-idb";
 import { Filter, NostrEvent, verifyEvent } from "nostr-tools";
 import { bufferTime, filter } from "rxjs";
+import { appRelays } from "./settings";
 
 let nostrIdb:
   | Promise<ReturnType<typeof openDB>>
@@ -32,6 +33,7 @@ eventStore.verifyEvent = verifyEvent;
 export const addressLoader = createAddressLoader(pool, {
   eventStore,
   cacheRequest,
+  extraRelays: appRelays,
 });
 
 let queue: NostrEvent[] = [];
