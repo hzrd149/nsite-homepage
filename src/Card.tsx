@@ -4,6 +4,7 @@ import { useEventModel } from "applesauce-react/hooks";
 import { type NostrEvent } from "nostr-tools";
 import { npubEncode } from "nostr-tools/nip19";
 import { addressLoader } from "./nostr";
+import { DEFUALT_PROFILE_RELAYS } from "./const";
 
 export default function SiteCard({ site }: { site: NostrEvent }) {
   const npub = npubEncode(site.pubkey);
@@ -18,7 +19,11 @@ export default function SiteCard({ site }: { site: NostrEvent }) {
 
   // load profile
   useEffect(() => {
-    addressLoader({ pubkey: site.pubkey, kind: 0 }).subscribe();
+    addressLoader({
+      pubkey: site.pubkey,
+      kind: 0,
+      relays: DEFUALT_PROFILE_RELAYS,
+    }).subscribe();
   }, [site]);
 
   return (

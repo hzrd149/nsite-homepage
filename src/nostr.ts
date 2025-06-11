@@ -19,7 +19,7 @@ async function getNostrIdb() {
   return await nostrIdb;
 }
 
-async function cacheRequest(filters: Filter[]) {
+export async function cacheRequest(filters: Filter[]) {
   const db = await getNostrIdb();
   return getEventsForFilters(db, filters);
 }

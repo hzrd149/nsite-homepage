@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import SiteCard from "./Card";
 import { FEATURED_SITES_LIST, NSITE_KIND } from "./const";
 import useDarkModeState from "./darkmode";
-import { addressLoader, eventStore, pool } from "./nostr";
+import { addressLoader, cacheRequest, eventStore, pool } from "./nostr";
 import { appRelays } from "./settings";
 import Settings from "./Settings";
 
@@ -31,12 +31,12 @@ function App() {
   // Update theme on document element
   useEffect(() => {
     document.documentElement.setAttribute(
-      'data-theme',
-      darkMode ? 'sunset' : 'winter'
+      "data-theme",
+      darkMode ? "sunset" : "winter",
     );
   }, [darkMode]);
 
-  // subscribe to relays
+  // Subscribe to relays
   useObservableMemo(
     () =>
       pool
@@ -44,6 +44,16 @@ function App() {
         .pipe(onlyEvents(), mapEventsToStore(eventStore)),
     [relays],
   );
+
+  // Load events from cache
+  useEffect(() => {
+    (async () => {
+      const events = await cacheRequest([
+        { kinds: [NSITE_KIND], "#d": ["/index.html"] },
+      ]);
+      for (let event of events) eventStore.add(event);
+    })();
+  }, []);
 
   useEffect(() => {
     addressLoader(FEATURED_SITES_LIST).subscribe();
@@ -84,28 +94,19 @@ function App() {
           onClick={() => setDarkMode(!darkMode)}
           aria-label="Toggle theme"
         >
-          <span className="text-xl">
-            {darkMode ? "💡" : "🕶"}
-          </span>
+          <span className="text-xl">{darkMode ? "💡" : "🕶"}</span>
         </button>
       </div>
 
       {/* Settings Modal */}
-      <Settings
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-      />
+      <Settings isOpen={showSettings} onClose={() => setShowSettings(false)} />
 
       {/* Main Container */}
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex flex-col items-center">
           {/* Logo */}
           <div className="mb-8">
-            <img
-              src="/nsite.svg"
-              alt="nsite logo"
-              className="w-40 h-auto"
-            />
+            <img src="/nsite.svg" alt="nsite logo" className="w-40 h-auto" />
           </div>
 
           {/* Header */}
@@ -163,10 +164,7 @@ function App() {
 
           {/* Show All Button */}
           {sites && sites.length > 4 && !showAll && (
-            <a
-              href="#all"
-              className="btn btn-primary btn-lg"
-            >
+            <a href="#all" className="btn btn-primary btn-lg">
               Show All Sites
             </a>
           )}

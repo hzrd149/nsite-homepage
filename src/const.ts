@@ -1,5 +1,10 @@
 export const NSITE_KIND = 34128;
 
+export const DEFUALT_PROFILE_RELAYS = [
+  "wss://purplepag.es",
+  "wss://index.hzrd149.com",
+];
+
 export const DEFAULT_RELAYS = [
   "wss://nostrue.com",
   "wss://relay.damus.io",
