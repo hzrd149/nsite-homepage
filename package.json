@@ -10,8 +10,7 @@
     "format": "prettier -w ."
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
+    "@tailwindcss/vite": "^4.1.9",
     "applesauce-core": "^2.0.0",
     "applesauce-loaders": "^2.0.0",
     "applesauce-react": "^2.0.0",
@@ -21,12 +20,14 @@
     "nostr-tools": "^2.15.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "tailwindcss": "^4.1.9"
   },
   "devDependencies": {
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^3.10.2",
+    "daisyui": "^5.0.43",
     "globals": "^15.15.0",
     "prettier": "^3.5.3",
     "typescript": "~5.6.3",

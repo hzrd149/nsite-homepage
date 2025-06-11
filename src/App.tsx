@@ -1,5 +1,3 @@
-import { Global, css } from "@emotion/react";
-import styled from "@emotion/styled";
 import { mapEventsToStore } from "applesauce-core";
 import { getEventUID } from "applesauce-core/helpers/event";
 import { ReplaceableModel, TimelineModel } from "applesauce-core/models";
@@ -17,105 +15,6 @@ import useDarkModeState from "./darkmode";
 import { addressLoader, eventStore, pool } from "./nostr";
 import { appRelays } from "./settings";
 
-// Define global CSS variables based on the dark mode flag
-const globalStyles = (darkMode: boolean) => css`
-  :root {
-    --background: ${darkMode ? "#121212" : "#fff"};
-    --text: ${darkMode ? "#eee" : "#333"};
-    --primary: ${darkMode ? "#007bff" : "#007bff"};
-    --secondary: ${darkMode ? "#aaa" : "#666"};
-    --card-background: ${darkMode ? "#1e1e1e" : "white"};
-    --card-shadow: ${darkMode
-      ? "0 2px 8px rgba(255, 255, 255, 0.1)"
-      : "0 2px 8px rgba(0, 0, 0, 0.1)"};
-    --hover-button: "${darkMode ? "#64b5f6" : "#0056b3"};";
-  }
-  body {
-    font-family: sans-serif;
-    background: var(--background);
-    color: var(--text);
-    margin: 0;
-    padding: 0;
-    transition:
-      background 0.2s,
-      color 0.2s;
-  }
-`;
-
-const Logo = styled.img`
-  width: 10em;
-  margin: 0 auto;
-`;
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 32px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: var(--text);
-`;
-
-const Header = styled.h1`
-  text-align: center;
-  color: var(--text);
-  margin-bottom: 1em;
-`;
-
-const About = styled.p`
-  text-align: center;
-  font-size: 1.1em;
-  margin-bottom: 2em;
-
-  a {
-    color: var(--primary);
-  }
-`;
-
-const SitesHeader = styled.h2`
-  text-align: center;
-  color: var(--text);
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
-  width: 100%;
-`;
-
-const ShowAllButton = styled.a`
-  display: block;
-  margin: 0 auto;
-  padding: 12px 24px;
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  text-decoration: none;
-
-  &:hover {
-    background-color: var(--hover-button);
-  }
-`;
-
-const ThemeToggleButton = styled.button`
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(128, 128, 128, 0.2);
-  padding: 4px 6px;
-  font-size: 24px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-`;
-
 function App() {
   const [showAll, setShowAll] = useState(location.hash === "#all");
   const [darkMode, setDarkMode] = useDarkModeState();
@@ -127,6 +26,14 @@ function App() {
     return () => window.removeEventListener("hashchange", listener);
   }, []);
 
+  // Update theme on document element
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      'data-theme',
+      darkMode ? 'sunset' : 'winter'
+    );
+  }, [darkMode]);
+
   // subscribe to relays
   useObservableMemo(
     () =>
@@ -137,7 +44,7 @@ function App() {
   );
 
   useEffect(() => {
-    addressLoader({ ...FEATURED_SITES_LIST }).subscribe();
+    addressLoader(FEATURED_SITES_LIST).subscribe();
   }, []);
   const featuredList = useEventModel(ReplaceableModel, [
     FEATURED_SITES_LIST.kind,
@@ -157,38 +64,97 @@ function App() {
     );
 
   return (
-    <>
-      <Global styles={globalStyles(darkMode)} />
-      <Container>
-        <ThemeToggleButton onClick={() => setDarkMode(!darkMode)}>
-          {darkMode ? "💡" : "🕶"}
-        </ThemeToggleButton>
-        <Logo src="/nsite.svg" />
-        <Header>Welcome to nsite</Header>
-        <About>
-          <a href="https://github.com/hzrd149/nsite-ts" target="_blank">
-            nsite
-          </a>{" "}
-          is a static website hosting solution built on top of{" "}
-          <a href="https://github.com/nostr-protocol/nostr" target="_blank">
-            nostr
-          </a>{" "}
-          and{" "}
-          <a href="https://github.com/hzrd149/blossom" target="_blank">
-            blossom
-          </a>
-        </About>
-        <SitesHeader>{showAll ? "All" : "Featured"} sites</SitesHeader>
-        <Grid>
-          {(showAll ? sites : featured)?.map((site: any) => (
-            <SiteCard key={getEventUID(site)} site={site} />
-          )) ?? <p>Loading...</p>}
-        </Grid>
-        {sites && sites.length > 4 && !showAll && (
-          <ShowAllButton href="#all">Show All Sites</ShowAllButton>
-        )}
-      </Container>
-    </>
+    <div className="min-h-screen bg-base-100">
+      {/* Theme Toggle Button */}
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          className="btn btn-circle btn-ghost btn-sm"
+          onClick={() => setDarkMode(!darkMode)}
+          aria-label="Toggle theme"
+        >
+          <span className="text-xl">
+            {darkMode ? "💡" : "🕶"}
+          </span>
+        </button>
+      </div>
+
+      {/* Main Container */}
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="flex flex-col items-center">
+          {/* Logo */}
+          <div className="mb-8">
+            <img
+              src="/nsite.svg"
+              alt="nsite logo"
+              className="w-40 h-auto"
+            />
+          </div>
+
+          {/* Header */}
+          <h1 className="text-4xl font-bold text-center mb-4 text-base-content">
+            Welcome to nsite
+          </h1>
+
+          {/* About Section */}
+          <div className="text-center text-lg mb-8 max-w-2xl">
+            <p className="text-base-content/80">
+              <a
+                href="https://github.com/hzrd149/nsite-ts"
+                target="_blank"
+                className="link link-primary font-medium"
+              >
+                nsite
+              </a>{" "}
+              is a static website hosting solution built on top of{" "}
+              <a
+                href="https://github.com/nostr-protocol/nostr"
+                target="_blank"
+                className="link link-primary font-medium"
+              >
+                nostr
+              </a>{" "}
+              and{" "}
+              <a
+                href="https://github.com/hzrd149/blossom"
+                target="_blank"
+                className="link link-primary font-medium"
+              >
+                blossom
+              </a>
+            </p>
+          </div>
+
+          {/* Sites Header */}
+          <h2 className="text-2xl font-semibold text-center mb-6 text-base-content">
+            {showAll ? "All" : "Featured"} sites
+          </h2>
+
+          {/* Sites Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full mb-8">
+            {(showAll ? sites : featured)?.map((site: any) => (
+              <SiteCard key={getEventUID(site)} site={site} />
+            )) ?? (
+              <div className="col-span-full flex justify-center">
+                <div className="flex items-center gap-2">
+                  <span className="loading loading-spinner loading-md"></span>
+                  <span className="text-base-content/60">Loading...</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Show All Button */}
+          {sites && sites.length > 4 && !showAll && (
+            <a
+              href="#all"
+              className="btn btn-primary btn-lg"
+            >
+              Show All Sites
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 

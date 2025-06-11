@@ -1,67 +1,9 @@
 import { useEffect } from "react";
-import styled from "@emotion/styled";
 import { ProfileModel } from "applesauce-core/models";
 import { useEventModel } from "applesauce-react/hooks";
 import { type NostrEvent } from "nostr-tools";
 import { npubEncode } from "nostr-tools/nip19";
 import { addressLoader } from "./nostr";
-
-const Card = styled.a`
-  /* layout styles */
-  display: flex;
-  flex-direction: column;
-  gap: 0.3em;
-
-  /* box styles */
-  border-radius: 8px;
-  box-shadow: var(--card-shadow);
-  padding: 0.5em;
-  background: var(--card-background);
-  transition: transform 0.2s;
-  cursor: pointer;
-  color: var(--text);
-  text-decoration: none;
-
-  &:hover {
-    transform: translateY(-4px);
-  }
-`;
-
-const Avatar = styled.img`
-  width: 3rem;
-  height: 3rem;
-  border: none;
-  outline: none;
-  border-radius: 50%;
-`;
-
-const Profile = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 0.8em;
-  align-items: center;
-  padding: 0.2em;
-`;
-
-const Title = styled.h3`
-  margin: 12px 0 8px;
-  color: var(--text);
-  margin: 0;
-`;
-
-const Description = styled.p`
-  color: var(--secondary);
-  font-size: 14px;
-  line-height: 1.4;
-  margin: 0;
-`;
-
-const Updated = styled.div`
-  margin-top: auto;
-  font-size: 0.6em;
-  font-style: italic;
-  color: var(--secondary);
-`;
 
 export default function SiteCard({ site }: { site: NostrEvent }) {
   const npub = npubEncode(site.pubkey);
@@ -76,19 +18,46 @@ export default function SiteCard({ site }: { site: NostrEvent }) {
   }, [site]);
 
   return (
-    <Card href={url.toString()}>
-      <Profile>
-        {picture && <Avatar src={picture} className="avatar" />}
-        <div>
-          <Title>
-            {profile?.display_name || profile?.name || npub.slice(0, 8)}
-          </Title>
-          <Description>{profile?.nip05}</Description>
+    <a
+      href={url.toString()}
+      className="card bg-base-200 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-1 cursor-pointer group"
+    >
+      <div className="card-body p-4">
+        {/* Profile Section */}
+        <div className="flex items-center gap-3 mb-3">
+          {picture && (
+            <div className="avatar">
+              <div className="w-12 h-12 rounded-full">
+                <img
+                  src={picture}
+                  alt="Profile avatar"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <h3 className="card-title text-base font-semibold text-base-content truncate">
+              {profile?.display_name || profile?.name || npub.slice(0, 8)}
+            </h3>
+            {profile?.nip05 && (
+              <p className="text-sm text-base-content/60 truncate">
+                {profile.nip05}
+              </p>
+            )}
+          </div>
         </div>
-      </Profile>
-      <Updated>
-        Updated <time>{new Date(site.created_at * 1000).toLocaleString()}</time>
-      </Updated>
-    </Card>
+
+        {/* Updated Time */}
+        <div className="mt-auto">
+          <div className="text-xs text-base-content/50 italic">
+            Updated{" "}
+            <time className="font-medium">
+              {new Date(site.created_at * 1000).toLocaleString()}
+            </time>
+          </div>
+        </div>
+      </div>
+    </a>
   );
 }
