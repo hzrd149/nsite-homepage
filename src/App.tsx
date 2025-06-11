@@ -14,10 +14,12 @@ import { FEATURED_SITES_LIST, NSITE_KIND } from "./const";
 import useDarkModeState from "./darkmode";
 import { addressLoader, eventStore, pool } from "./nostr";
 import { appRelays } from "./settings";
+import Settings from "./Settings";
 
 function App() {
   const [showAll, setShowAll] = useState(location.hash === "#all");
   const [darkMode, setDarkMode] = useDarkModeState();
+  const [showSettings, setShowSettings] = useState(false);
   const relays = useObservableState(appRelays);
 
   useEffect(() => {
@@ -65,8 +67,18 @@ function App() {
 
   return (
     <div className="min-h-screen bg-base-100">
-      {/* Theme Toggle Button */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Top Right Controls */}
+      <div className="fixed top-4 right-4 z-50 flex gap-2">
+        {/* Settings Button */}
+        <button
+          className="btn btn-circle btn-ghost btn-sm"
+          onClick={() => setShowSettings(true)}
+          aria-label="Open settings"
+        >
+          <span className="text-xl">⚙️</span>
+        </button>
+
+        {/* Theme Toggle Button */}
         <button
           className="btn btn-circle btn-ghost btn-sm"
           onClick={() => setDarkMode(!darkMode)}
@@ -77,6 +89,12 @@ function App() {
           </span>
         </button>
       </div>
+
+      {/* Settings Modal */}
+      <Settings
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+      />
 
       {/* Main Container */}
       <div className="container mx-auto px-4 py-8 max-w-6xl">
