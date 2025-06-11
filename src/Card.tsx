@@ -7,7 +7,11 @@ import { addressLoader } from "./nostr";
 
 export default function SiteCard({ site }: { site: NostrEvent }) {
   const npub = npubEncode(site.pubkey);
-  const url = new URL("/", `${location.protocol}//${npub}.${location.host}`);
+  const host = location.host.replace(
+    /^npub1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{58,}\./,
+    "",
+  );
+  const url = new URL("/", `${location.protocol}//${npub}.${host}`);
 
   const profile = useEventModel(ProfileModel, [site.pubkey]) as any;
   const picture = profile?.picture || profile?.image;
