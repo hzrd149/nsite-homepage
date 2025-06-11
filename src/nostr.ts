@@ -34,6 +34,7 @@ export const addressLoader = createAddressLoader(pool, {
   eventStore,
   cacheRequest,
   extraRelays: appRelays,
+  bufferTime: 200,
 });
 
 let queue: NostrEvent[] = [];
