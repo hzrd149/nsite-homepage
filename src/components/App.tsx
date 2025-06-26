@@ -20,6 +20,8 @@ function App() {
   const [showAll, setShowAll] = useState(location.hash === "#all");
   const [darkMode, setDarkMode] = useDarkModeState();
   const [showSettings, setShowSettings] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [hideUnknown, setHideUnknown] = useState(false);
   const relays = useObservableState(appRelays);
 
   useEffect(() => {
@@ -143,6 +145,47 @@ function App() {
             </p>
           </div>
 
+          {/* Search and Filter Controls */}
+          <div className="w-full max-w-2xl mb-8 space-y-4">
+            {/* Search Box */}
+            <input
+              type="text"
+              placeholder="Search sites by title, description, or author..."
+              className="input input-bordered input-lg w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            {/* Filter Switches */}
+            <div className="flex items-center justify-center gap-6 flex-wrap">
+              <label className="label cursor-pointer flex items-center gap-2">
+                <span className="label-text">Show all sites</span>
+                <input
+                  type="checkbox"
+                  className="toggle toggle-secondary"
+                  checked={showAll}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      location.hash = "#all";
+                    } else {
+                      location.hash = "";
+                    }
+                  }}
+                />
+              </label>
+
+              <label className="label cursor-pointer flex items-center gap-2">
+                <span className="label-text">Hide unknown sites</span>
+                <input
+                  type="checkbox"
+                  className="toggle toggle-primary"
+                  checked={hideUnknown}
+                  onChange={(e) => setHideUnknown(e.target.checked)}
+                />
+              </label>
+            </div>
+          </div>
+
           {/* Sites Header */}
           <h2 className="text-2xl font-semibold text-center mb-6 text-base-content">
             {showAll ? "All" : "Featured"} sites
@@ -151,7 +194,12 @@ function App() {
           {/* Sites Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
             {(showAll ? sites : featured)?.map((site: any) => (
-              <SiteCard key={getEventUID(site)} site={site} />
+              <SiteCard
+                key={getEventUID(site)}
+                site={site}
+                searchTerm={searchTerm}
+                hideUnknown={hideUnknown}
+              />
             )) ?? (
               <div className="col-span-full flex justify-center">
                 <div className="flex items-center gap-2">

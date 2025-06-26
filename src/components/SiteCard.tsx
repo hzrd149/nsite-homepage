@@ -9,7 +9,17 @@ import { DEFUALT_PROFILE_RELAYS } from "../const";
 import { getOpenGraphData, OpenGraphData } from "../helpers/open-graph";
 import { addressLoader } from "../nostr";
 
-export default function SiteCard({ site }: { site: NostrEvent }) {
+interface SiteCardProps {
+  site: NostrEvent;
+  searchTerm?: string;
+  hideUnknown?: boolean;
+}
+
+export default function SiteCard({
+  site,
+  searchTerm = "",
+  hideUnknown = false,
+}: SiteCardProps) {
   const npub = npubEncode(site.pubkey);
   const host = location.host.replace(
     /^npub1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{58,}\./,
@@ -48,6 +58,33 @@ export default function SiteCard({ site }: { site: NostrEvent }) {
       });
   }, [url]);
 
+  // Filter logic
+  const displayName = getDisplayName(profile, npub.slice(0, 12));
+
+  // Check if site should be hidden due to unknown data
+  if (hideUnknown) {
+    const hasOpenGraphData = ogData && (ogData.title || ogData.description);
+    const hasProfileData = profile && getDisplayName(profile);
+
+    if (!hasOpenGraphData && !hasProfileData) {
+      return null;
+    }
+  }
+
+  // Check if site matches search term
+  if (searchTerm.trim()) {
+    const searchLower = searchTerm.toLowerCase().trim();
+    const titleMatch = ogData?.title?.toLowerCase().includes(searchLower);
+    const descriptionMatch = ogData?.description
+      ?.toLowerCase()
+      .includes(searchLower);
+    const displayNameMatch = displayName?.toLowerCase().includes(searchLower);
+
+    if (!titleMatch && !descriptionMatch && !displayNameMatch) {
+      return null;
+    }
+  }
+
   return (
     <a
       href={url.toString()}
@@ -67,7 +104,7 @@ export default function SiteCard({ site }: { site: NostrEvent }) {
             ) : (
               <>
                 <h2 className="text-lg font-bold text-base-content mb-2 overflow-hidden text-ellipsis line-clamp-2">
-                  {ogData?.title || getDisplayName(profile, npub.slice(0, 12))}
+                  {ogData?.title || displayName}
                 </h2>
                 {ogData?.description && (
                   <p className="text-sm text-base-content/70 leading-relaxed overflow-hidden text-ellipsis line-clamp-2">
@@ -94,9 +131,7 @@ export default function SiteCard({ site }: { site: NostrEvent }) {
                     </div>
                   </div>
                 )}
-                <span className="font-medium truncate">
-                  {getDisplayName(profile, npub.slice(0, 12))}
-                </span>
+                <span className="font-medium truncate">{displayName}</span>
                 {profile?.nip05 && (
                   <span className="text-base-content/40 truncate">
                     ({profile.nip05})
