@@ -3,8 +3,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { EventStoreProvider } from "applesauce-react/providers";
 
-import App from "./App.tsx";
-import { eventStore } from "./nostr";
+import App from "./components/App.tsx";
+import { eventStore } from "./nostr.ts";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

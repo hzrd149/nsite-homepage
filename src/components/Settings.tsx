@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useObservableState } from "applesauce-react/hooks";
-import { appRelays } from "./settings";
-import { DEFAULT_RELAYS } from "./const";
+import { appRelays } from "../settings";
+import { DEFAULT_RELAYS } from "../const";
 
 interface SettingsProps {
   isOpen: boolean;
@@ -58,7 +58,13 @@ function RelayList({ relays, onRemoveRelay }: RelayListProps) {
 }
 
 // Sub-component for adding new relays
-function AddRelayForm({ newRelay, setNewRelay, error, setError, onAddRelay }: AddRelayFormProps) {
+function AddRelayForm({
+  newRelay,
+  setNewRelay,
+  error,
+  setError,
+  onAddRelay,
+}: AddRelayFormProps) {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       onAddRelay();
@@ -79,10 +85,7 @@ function AddRelayForm({ newRelay, setNewRelay, error, setError, onAddRelay }: Ad
           }}
           onKeyDown={handleKeyPress}
         />
-        <button
-          className="btn btn-primary"
-          onClick={onAddRelay}
-        >
+        <button className="btn btn-primary" onClick={onAddRelay}>
           Add
         </button>
       </div>
@@ -133,7 +136,7 @@ export default function Settings({ isOpen, onClose }: SettingsProps) {
   };
 
   const removeRelay = (relayToRemove: string) => {
-    appRelays.next(relays.filter(relay => relay !== relayToRemove));
+    appRelays.next(relays.filter((relay) => relay !== relayToRemove));
   };
 
   const resetToDefaults = () => {
@@ -152,7 +155,8 @@ export default function Settings({ isOpen, onClose }: SettingsProps) {
           <div className="mb-6">
             <h4 className="font-semibold text-base mb-3">App Relays</h4>
             <p className="text-sm text-base-content/70 mb-4">
-              Configure the relays used to fetch nsite data. Changes are saved automatically.
+              Configure the relays used to fetch nsite data. Changes are saved
+              automatically.
             </p>
 
             {/* Add New Relay Form */}
@@ -165,10 +169,7 @@ export default function Settings({ isOpen, onClose }: SettingsProps) {
             />
 
             {/* Current Relays List */}
-            <RelayList
-              relays={relays}
-              onRemoveRelay={removeRelay}
-            />
+            <RelayList relays={relays} onRemoveRelay={removeRelay} />
 
             {/* Reset Button */}
             <button

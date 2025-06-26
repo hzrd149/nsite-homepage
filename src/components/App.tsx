@@ -9,11 +9,11 @@ import {
 import { onlyEvents } from "applesauce-relay";
 import { useEffect, useState } from "react";
 
-import SiteCard from "./Card";
-import { FEATURED_SITES_LIST, NSITE_KIND } from "./const";
-import useDarkModeState from "./darkmode";
-import { addressLoader, cacheRequest, eventStore, pool } from "./nostr";
-import { appRelays } from "./settings";
+import { FEATURED_SITES_LIST, NSITE_KIND } from "../const";
+import useDarkModeState from "../darkmode";
+import { addressLoader, cacheRequest, eventStore, pool } from "../nostr";
+import { appRelays } from "../settings";
+import SiteCard from "./SiteCard";
 import Settings from "./Settings";
 
 function App() {
@@ -149,7 +149,7 @@ function App() {
           </h2>
 
           {/* Sites Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
             {(showAll ? sites : featured)?.map((site: any) => (
               <SiteCard key={getEventUID(site)} site={site} />
             )) ?? (

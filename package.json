@@ -10,18 +10,18 @@
     "format": "prettier -w ."
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.9",
-    "applesauce-core": "^2.0.0",
-    "applesauce-loaders": "^2.0.0",
-    "applesauce-react": "^2.0.0",
-    "applesauce-relay": "^2.0.0",
+    "@tailwindcss/vite": "^4.1.11",
+    "applesauce-core": "^2.1.1",
+    "applesauce-loaders": "^2.1.0",
+    "applesauce-react": "^2.1.0",
+    "applesauce-relay": "^2.1.1",
     "applesauce-signers": "^2.0.0",
-    "nostr-idb": "^2.3.0",
+    "nostr-idb": "^2.4.0",
     "nostr-tools": "^2.15.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rxjs": "^7.8.2",
-    "tailwindcss": "^4.1.9"
+    "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
     "@types/react": "^18.3.23",
@@ -29,7 +29,7 @@
     "@vitejs/plugin-react-swc": "^3.10.2",
     "daisyui": "^5.0.43",
     "globals": "^15.15.0",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.1",
     "typescript": "~5.6.3",
     "vite": "^6.3.5"
   },
