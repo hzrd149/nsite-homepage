@@ -2,7 +2,9 @@
   "relays": [
     "wss://nostrue.com",
     "wss://relay.damus.io",
-    "wss://ae.purplerelay.com"
+    "wss://nos.lol",
+    "wss://relay.primal.net",
+    "wss://relay.nsite.lol"
   ],
   "servers": [
     "https://nostr.download",

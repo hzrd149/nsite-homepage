@@ -30,5 +30,13 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "v2.x"
+
+      - name: Install nsyte CLI
+        run: deno install -A -f -g -n nsyte jsr:@nsyte/cli
+
       - name: Deploy nsite
-        run: npx -y nsite-cli upload dist --verbose --purge --privatekey ${{ secrets.NSITE_KEY }}
+        run: nsyte upload docs -i --purge --privatekey ${{ secrets.NSITE_KEY }}
