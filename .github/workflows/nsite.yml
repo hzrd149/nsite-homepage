@@ -30,13 +30,10 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Install Deno
-        uses: denoland/setup-deno@v2
+      - name: Deploy to nsite
+        uses: sandwichfarm/nsite-action@v0.2.2
         with:
-          deno-version: "v2.x"
-
-      - name: Install nsyte CLI
-        run: deno install -A -f -g -n nsyte jsr:@nsyte/cli
-
-      - name: Deploy nsite
-        run: nsyte upload dist -i --purge --privatekey ${{ secrets.NSITE_KEY }}
+          nbunksec: ${{ secrets.NSITE_BUNKER }}
+          directory: "./dist"
+          force: true
+          purge: true
