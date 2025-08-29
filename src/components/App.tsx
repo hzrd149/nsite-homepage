@@ -13,8 +13,8 @@ import { FEATURED_SITES_LIST, NSITE_KIND } from "../const";
 import useDarkModeState from "../darkmode";
 import { addressLoader, cacheRequest, eventStore, pool } from "../nostr";
 import { appRelays } from "../settings";
-import SiteCard from "./SiteCard";
 import Settings from "./Settings";
+import SiteCard from "./SiteCard";
 
 function App() {
   const [showAll, setShowAll] = useState(location.hash === "#all");
@@ -60,16 +60,12 @@ function App() {
   useEffect(() => {
     addressLoader(FEATURED_SITES_LIST).subscribe();
   }, []);
-  const featuredList = useEventModel(ReplaceableModel, [
-    FEATURED_SITES_LIST.kind,
-    FEATURED_SITES_LIST.pubkey,
-    FEATURED_SITES_LIST.identifier,
-  ]) as any;
+  const featuredList = useEventModel(ReplaceableModel, [FEATURED_SITES_LIST]);
 
   // get sites
   const sites = useEventModel(TimelineModel, [
     { kinds: [NSITE_KIND], "#d": ["/index.html"] },
-  ]) as any;
+  ]);
 
   const featured =
     featuredList &&

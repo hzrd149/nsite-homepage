@@ -5,9 +5,7 @@ import { type NostrEvent } from "nostr-tools";
 import { npubEncode } from "nostr-tools/nip19";
 import { useEffect, useMemo, useState } from "react";
 
-import { DEFUALT_PROFILE_RELAYS } from "../const";
 import { getOpenGraphData, OpenGraphData } from "../helpers/open-graph";
-import { addressLoader } from "../nostr";
 
 interface SiteCardProps {
   site: NostrEvent;
@@ -38,15 +36,6 @@ export default function SiteCard({
 
   const [ogData, setOgData] = useState<OpenGraphData | null>();
   const [isLoading, setIsLoading] = useState(false);
-
-  // load profile
-  useEffect(() => {
-    addressLoader({
-      pubkey: site.pubkey,
-      kind: 0,
-      relays: DEFUALT_PROFILE_RELAYS,
-    }).subscribe();
-  }, [site.pubkey]);
 
   // fetch Open Graph data
   useEffect(() => {
