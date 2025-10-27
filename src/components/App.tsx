@@ -60,7 +60,7 @@ function App() {
   useEffect(() => {
     addressLoader(FEATURED_SITES_LIST).subscribe();
   }, []);
-  const featuredList = useEventModel(ReplaceableModel, [FEATURED_SITES_LIST]);
+  const featuredList = useEventModel(ReplaceableModel, [FEATURED_SITES_LIST])
 
   // get sites
   const sites = useEventModel(TimelineModel, [
