@@ -1,5 +1,5 @@
 import { EventStore } from "applesauce-core/event-store";
-import { persistEventsToCache } from "applesauce-core/helpers";
+import { isFromCache, persistEventsToCache } from "applesauce-core/helpers";
 import { createAddressLoader } from "applesauce-loaders/loaders";
 import { RelayPool } from "applesauce-relay";
 import { Filter, verifyEvent } from "nostr-tools";
@@ -14,7 +14,12 @@ export async function cacheRequest(filters: Filter[]) {
 export const pool = new RelayPool();
 export const eventStore = new EventStore();
 
-eventStore.verifyEvent = verifyEvent;
+eventStore.verifyEvent = event => {
+  // Skip verifying events for cached events
+  if (isFromCache(event)) return true;
+
+  return verifyEvent(event);
+};
 
 // Create functional address loader - using rxNostr as pool since it implements the required interface
 export const addressLoader = createAddressLoader(pool, {
