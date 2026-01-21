@@ -1,4 +1,6 @@
-export const NSITE_KIND = 34128;
+export const NSITE_ROOT_KIND = 15128; // Root site manifest (replaceable event, no d tag)
+export const NSITE_NAMED_KIND = 35128; // Named site manifest (addressable event, has d tag)
+export const NSITE_KINDS = [NSITE_ROOT_KIND, NSITE_NAMED_KIND]; // All site manifest kinds
 
 export const DEFUALT_PROFILE_RELAYS = [
   "wss://purplepag.es",

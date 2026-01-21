@@ -1,23 +1,17 @@
 {
   "relays": [
-    "wss://relay.nsite.lol",
     "wss://relay.damus.io",
     "wss://relay.primal.net",
     "wss://nos.lol",
-    "wss://nostrue.com"
+    "wss://relay.nsite.lol"
   ],
   "servers": [
     "https://cdn.hzrd149.com",
     "https://nostr.download",
-    "https://blossom.primal.net",
-    "https://24242.io"
+    "https://blossom.primal.net"
   ],
-  "profile": {
-    "name": "nsite.lol",
-    "display_name": "nsite.lol",
-    "about": "The official account for nsite.lol\nRunning: https://github.com/hzrd149/nsite-gateway"
-  },
-  "publishProfile": true,
-  "publishRelayList": true,
-  "publishServerList": true
+  "id": null,
+  "title": "nsite.lol",
+  "description": "A simple homepage for nsite.lol",
+  "bunkerPubkey": "1805301ca7c1ad2f9349076cf282f905b3c1e540e88675e14b95856c40b75e33"
 }

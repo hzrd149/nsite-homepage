@@ -9,7 +9,7 @@ import {
 import { onlyEvents } from "applesauce-relay";
 import { useEffect, useState } from "react";
 
-import { FEATURED_SITES_LIST, NSITE_KIND } from "../const";
+import { FEATURED_SITES_LIST, NSITE_KINDS } from "../const";
 import useDarkModeState from "../darkmode";
 import { addressLoader, cacheRequest, eventStore, pool } from "../nostr";
 import { appRelays } from "../settings";
@@ -42,7 +42,7 @@ function App() {
   useObservableMemo(
     () =>
       pool
-        .subscription(relays, { kinds: [NSITE_KIND], "#d": ["/index.html"] })
+        .subscription(relays, { kinds: NSITE_KINDS })
         .pipe(onlyEvents(), mapEventsToStore(eventStore)),
     [relays],
   );
@@ -50,9 +50,7 @@ function App() {
   // Load events from cache
   useEffect(() => {
     (async () => {
-      const events = await cacheRequest([
-        { kinds: [NSITE_KIND], "#d": ["/index.html"] },
-      ]);
+      const events = await cacheRequest([{ kinds: NSITE_KINDS }]);
       for (let event of events) eventStore.add(event);
     })();
   }, []);
@@ -60,16 +58,19 @@ function App() {
   useEffect(() => {
     addressLoader(FEATURED_SITES_LIST).subscribe();
   }, []);
-  const featuredList = useEventModel(ReplaceableModel, [FEATURED_SITES_LIST])
+  const featuredList = useEventModel(ReplaceableModel, [FEATURED_SITES_LIST]);
 
   // get sites
-  const sites = useEventModel(TimelineModel, [
-    { kinds: [NSITE_KIND], "#d": ["/index.html"] },
-  ]);
+  const sites = useEventModel(TimelineModel, [{ kinds: NSITE_KINDS }]);
+
+  // Filter sites to only show those with /index.html in their manifest
+  const validSites = sites?.filter((site: any) =>
+    site.tags.some((t: any) => t[0] === "path" && t[1] === "/index.html"),
+  );
 
   const featured =
     featuredList &&
-    sites?.filter((site: any) =>
+    validSites?.filter((site: any) =>
       featuredList.tags.some((t: any) => t[1] === site.pubkey),
     );
 
@@ -189,7 +190,7 @@ function App() {
 
           {/* Sites Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
-            {(showAll ? sites : featured)?.map((site: any) => (
+            {(showAll ? validSites : featured)?.map((site: any) => (
               <SiteCard
                 key={getEventUID(site)}
                 site={site}
@@ -207,7 +208,7 @@ function App() {
           </div>
 
           {/* Show All Button */}
-          {sites && sites.length > 4 && !showAll && (
+          {validSites && validSites.length > 4 && !showAll && (
             <a href="#all" className="btn btn-primary btn-lg">
               Show All Sites
             </a>

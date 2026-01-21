@@ -5,12 +5,35 @@ import { type NostrEvent } from "nostr-tools";
 import { npubEncode } from "nostr-tools/nip19";
 import { useEffect, useMemo, useState } from "react";
 
+import { NSITE_ROOT_KIND } from "../const";
 import { getOpenGraphData, OpenGraphData } from "../helpers/open-graph";
 
 interface SiteCardProps {
   site: NostrEvent;
   searchTerm?: string;
   hideUnknown?: boolean;
+}
+
+// Helper functions to extract manifest data from event tags
+function getManifestTitle(site: NostrEvent): string | undefined {
+  return site.tags.find((t) => t[0] === "title")?.[1];
+}
+
+function getManifestDescription(site: NostrEvent): string | undefined {
+  return site.tags.find((t) => t[0] === "description")?.[1];
+}
+
+function getManifestIdentifier(site: NostrEvent): string {
+  // For root sites (kind 15128), return "root"
+  if (site.kind === NSITE_ROOT_KIND) {
+    return "root";
+  }
+  // For named sites (kind 35128), return the d tag value
+  return site.tags.find((t) => t[0] === "d")?.[1] || "unknown";
+}
+
+function getManifestFileCount(site: NostrEvent): number {
+  return site.tags.filter((t) => t[0] === "path").length;
 }
 
 export default function SiteCard({
@@ -37,6 +60,15 @@ export default function SiteCard({
   const [ogData, setOgData] = useState<OpenGraphData | null>();
   const [isLoading, setIsLoading] = useState(false);
 
+  // Extract manifest metadata
+  const manifestTitle = useMemo(() => getManifestTitle(site), [site]);
+  const manifestDescription = useMemo(
+    () => getManifestDescription(site),
+    [site],
+  );
+  const identifier = useMemo(() => getManifestIdentifier(site), [site]);
+  const fileCount = useMemo(() => getManifestFileCount(site), [site]);
+
   // fetch Open Graph data
   useEffect(() => {
     setIsLoading(true);
@@ -52,10 +84,11 @@ export default function SiteCard({
 
   // Check if site should be hidden due to unknown data
   if (hideUnknown) {
+    const hasManifestData = manifestTitle || manifestDescription;
     const hasOpenGraphData = ogData && (ogData.title || ogData.description);
     const hasProfileData = profile && getDisplayName(profile);
 
-    if (!hasOpenGraphData && !hasProfileData) {
+    if (!hasManifestData && !hasOpenGraphData && !hasProfileData) {
       return null;
     }
   }
@@ -63,13 +96,25 @@ export default function SiteCard({
   // Check if site matches search term
   if (searchTerm.trim()) {
     const searchLower = searchTerm.toLowerCase().trim();
-    const titleMatch = ogData?.title?.toLowerCase().includes(searchLower);
-    const descriptionMatch = ogData?.description
+    const manifestTitleMatch = manifestTitle?.toLowerCase().includes(searchLower);
+    const manifestDescriptionMatch = manifestDescription
+      ?.toLowerCase()
+      .includes(searchLower);
+    const identifierMatch = identifier?.toLowerCase().includes(searchLower);
+    const ogTitleMatch = ogData?.title?.toLowerCase().includes(searchLower);
+    const ogDescriptionMatch = ogData?.description
       ?.toLowerCase()
       .includes(searchLower);
     const displayNameMatch = displayName?.toLowerCase().includes(searchLower);
 
-    if (!titleMatch && !descriptionMatch && !displayNameMatch) {
+    if (
+      !manifestTitleMatch &&
+      !manifestDescriptionMatch &&
+      !identifierMatch &&
+      !ogTitleMatch &&
+      !ogDescriptionMatch &&
+      !displayNameMatch
+    ) {
       return null;
     }
   }
@@ -82,8 +127,8 @@ export default function SiteCard({
       <div className="card-body p-0 flex flex-row h-full overflow-hidden">
         {/* Content Section - Left Side */}
         <div className="flex-1 p-4 flex flex-col min-w-0 overflow-hidden">
-          {/* Open Graph Title and Description */}
-          <div className="flex-1 mb-4 overflow-hidden">
+          {/* Site Title and Description */}
+          <div className="flex-1 mb-3 overflow-hidden">
             {isLoading ? (
               <div className="animate-pulse">
                 <div className="h-6 bg-base-300 rounded mb-2"></div>
@@ -93,24 +138,48 @@ export default function SiteCard({
             ) : (
               <>
                 <h2 className="text-lg font-bold text-base-content mb-2 overflow-hidden text-ellipsis line-clamp-2">
-                  {ogData?.title || displayName}
+                  {manifestTitle || ogData?.title || displayName}
                 </h2>
-                {ogData?.description && (
+                {(manifestDescription || ogData?.description) && (
                   <p className="text-sm text-base-content/70 leading-relaxed overflow-hidden text-ellipsis line-clamp-2">
-                    {ogData.description}
+                    {manifestDescription || ogData?.description}
                   </p>
                 )}
               </>
             )}
           </div>
 
+          {/* Site Metadata - Identifier and File Count */}
+          <div className="flex items-center gap-3 mb-3 text-xs text-base-content/60 flex-wrap">
+            <div className="badge badge-primary badge-sm">
+              {identifier}
+            </div>
+            <div className="flex items-center gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-3.5 w-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              <span>{fileCount} file{fileCount !== 1 ? "s" : ""}</span>
+            </div>
+          </div>
+
           {/* Published By Footer */}
-          <div className="mt-auto pt-3 border-t border-base-300 flex-shrink-0">
-            <div className="flex items-center justify-between text-xs text-base-content/60">
+          <div className="mt-auto pt-3 border-t border-base-300 shrink-0">
+            <div className="flex items-center justify-between text-xs text-base-content/60 gap-2">
               <div className="flex items-center gap-2 min-w-0 flex-1">
-                <span className="flex-shrink-0">Published by</span>
+                <span className="shrink-0">Published by</span>
                 {picture && (
-                  <div className="avatar flex-shrink-0">
+                  <div className="avatar shrink-0">
                     <div className="w-6 h-6 rounded-full">
                       <img
                         src={picture}
@@ -127,9 +196,9 @@ export default function SiteCard({
                   </span>
                 )}
               </div>
-              <time className="italic flex-shrink-0 ml-2">
-                {new Date(site.created_at * 1000).toLocaleDateString()}
-              </time>
+            </div>
+            <div className="text-xs text-base-content/50 italic mt-1">
+              Last updated {new Date(site.created_at * 1000).toLocaleDateString()}
             </div>
           </div>
         </div>
