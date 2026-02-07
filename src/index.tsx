@@ -1,5 +1,5 @@
 import "./index.css";
-import 'window.nostrdb.js'
+import "window.nostrdb.js";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { EventStoreProvider } from "applesauce-react/providers";

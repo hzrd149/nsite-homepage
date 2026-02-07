@@ -1,20 +1,20 @@
 import { mapEventsToStore } from "applesauce-core";
-import { getEventUID } from "applesauce-core/helpers/event";
-import { ReplaceableModel, TimelineModel } from "applesauce-core/models";
+import { getEventUID, hasNameValueTag } from "applesauce-core/helpers/event";
+import { TimelineModel } from "applesauce-core/models";
 import {
+  use$,
   useEventModel,
-  useObservableMemo,
   useObservableState,
 } from "applesauce-react/hooks";
-import { onlyEvents } from "applesauce-relay";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { FEATURED_SITES_LIST, NSITE_KINDS } from "../const";
+import { NSITE_KINDS, RECOMEND_ROOT_PUBKEY } from "../const";
 import useDarkModeState from "../darkmode";
-import { addressLoader, cacheRequest, eventStore, pool } from "../nostr";
-import { appRelays } from "../settings";
+import { cacheRequest, eventStore, pool } from "../nostr";
+import { appRelays$ } from "../settings";
 import Settings from "./Settings";
 import SiteCard from "./SiteCard";
+import { UserAvatar } from "./User";
 
 function App() {
   const [showAll, setShowAll] = useState(location.hash === "#all");
@@ -22,8 +22,9 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [hideUnknown, setHideUnknown] = useState(false);
-  const relays = useObservableState(appRelays);
+  const relays = useObservableState(appRelays$);
 
+  // Update showAll state on hashchange
   useEffect(() => {
     const listener = () => setShowAll(location.hash === "#all");
     window.addEventListener("hashchange", listener);
@@ -38,41 +39,53 @@ function App() {
     );
   }, [darkMode]);
 
-  // Subscribe to relays
-  useObservableMemo(
+  // Subscribe to app relays for site events
+  use$(
     () =>
       pool
         .subscription(relays, { kinds: NSITE_KINDS })
-        .pipe(onlyEvents(), mapEventsToStore(eventStore)),
+        .pipe(mapEventsToStore(eventStore)),
     [relays],
   );
 
   // Load events from cache
   useEffect(() => {
-    (async () => {
-      const events = await cacheRequest([{ kinds: NSITE_KINDS }]);
-      for (let event of events) eventStore.add(event);
-    })();
+    cacheRequest([{ kinds: NSITE_KINDS }]).then((events) =>
+      events.forEach((event) => eventStore.add(event)),
+    );
   }, []);
 
-  useEffect(() => {
-    addressLoader(FEATURED_SITES_LIST).subscribe();
-  }, []);
-  const featuredList = useEventModel(ReplaceableModel, [FEATURED_SITES_LIST]);
-
-  // get sites
-  const sites = useEventModel(TimelineModel, [{ kinds: NSITE_KINDS }]);
-
-  // Filter sites to only show those with /index.html in their manifest
-  const validSites = sites?.filter((site: any) =>
-    site.tags.some((t: any) => t[0] === "path" && t[1] === "/index.html"),
+  // Get contacts for the user using eventStore.contacts()
+  const contacts = use$(
+    () =>
+      RECOMEND_ROOT_PUBKEY
+        ? eventStore.contacts(RECOMEND_ROOT_PUBKEY)
+        : undefined,
+    [],
   );
 
-  const featured =
-    featuredList &&
-    validSites?.filter((site: any) =>
-      featuredList.tags.some((t: any) => t[1] === site.pubkey),
-    );
+  // Extract pubkeys from contacts
+  const filter = useMemo(
+    () =>
+      showAll || !contacts
+        ? // View all sites
+          { kinds: NSITE_KINDS }
+        : // View just the sites by the root contacts
+          {
+            kinds: NSITE_KINDS,
+            authors: contacts.map((contact) => contact.pubkey),
+          },
+    [contacts, showAll],
+  );
+
+  // get sites
+  const sites = useEventModel(TimelineModel, [filter]);
+
+  // Filter sites to only show those with an index page
+  const sitesWithIndexPage = useMemo(
+    () => sites?.filter((site) => hasNameValueTag(site, "path", "/index.html")),
+    [sites],
+  );
 
   return (
     <div className="min-h-screen bg-base-100">
@@ -117,7 +130,7 @@ function App() {
           <div className="text-center text-lg mb-8 max-w-2xl">
             <p className="text-base-content/80">
               <a
-                href="https://github.com/hzrd149/nsite-ts"
+                href="https://github.com/hzrd149/nsite-gateway"
                 target="_blank"
                 className="link link-primary font-medium"
               >
@@ -184,13 +197,30 @@ function App() {
           </div>
 
           {/* Sites Header */}
-          <h2 className="text-2xl font-semibold text-center mb-6 text-base-content">
-            {showAll ? "All" : "Featured"} sites
-          </h2>
+          {showAll ? (
+            <h2 className="text-2xl font-semibold text-center mb-6">
+              All sites
+            </h2>
+          ) : contacts ? (
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold text-center mb-1">
+                nsites published by:
+              </h2>
+              <div className="flex gap-2">
+                {contacts.map((user) => (
+                  <UserAvatar user={user} size={6} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <h2 className="text-2xl font-semibold text-center mb-6">
+              All sites
+            </h2>
+          )}
 
           {/* Sites Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
-            {(showAll ? validSites : featured)?.map((site: any) => (
+            {sitesWithIndexPage?.map((site) => (
               <SiteCard
                 key={getEventUID(site)}
                 site={site}
@@ -208,7 +238,7 @@ function App() {
           </div>
 
           {/* Show All Button */}
-          {validSites && validSites.length > 4 && !showAll && (
+          {sitesWithIndexPage && sitesWithIndexPage.length > 4 && !showAll && (
             <a href="#all" className="btn btn-primary btn-lg">
               Show All Sites
             </a>

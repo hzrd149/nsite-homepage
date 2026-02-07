@@ -1,9 +1,14 @@
 import { EventStore } from "applesauce-core/event-store";
-import { isFromCache, persistEventsToCache } from "applesauce-core/helpers";
+import {
+  Filter,
+  isFromCache,
+  persistEventsToCache,
+  verifyEvent,
+} from "applesauce-core/helpers";
 import { createEventLoaderForStore } from "applesauce-loaders/loaders";
 import { RelayPool } from "applesauce-relay";
-import { Filter, verifyEvent } from "nostr-tools";
-import { appRelays } from "./settings";
+import { appRelays$ } from "./settings";
+import { DEFUALT_LOOKUP_RELAYS } from "./const";
 
 // Load events from cache
 export async function cacheRequest(filters: Filter[]) {
@@ -23,7 +28,8 @@ eventStore.verifyEvent = (event) => {
 // Create functional address loader - using rxNostr as pool since it implements the required interface
 export const eventLoader = createEventLoaderForStore(eventStore, pool, {
   cacheRequest,
-  extraRelays: appRelays,
+  extraRelays: appRelays$,
+  lookupRelays: DEFUALT_LOOKUP_RELAYS,
   bufferTime: 200,
 });
 

@@ -1,12 +1,16 @@
-import { getDisplayName, getProfilePicture } from "applesauce-core/helpers";
+import {
+  getDisplayName,
+  getProfilePicture,
+  NostrEvent,
+  npubEncode,
+} from "applesauce-core/helpers";
 import { ProfileModel } from "applesauce-core/models";
 import { useEventModel } from "applesauce-react/hooks";
-import { type NostrEvent } from "nostr-tools";
-import { npubEncode } from "nostr-tools/nip19";
 import { useEffect, useMemo, useState } from "react";
 
 import { NSITE_ROOT_KIND } from "../const";
 import { getOpenGraphData, OpenGraphData } from "../helpers/open-graph";
+import { UserAvatar, UserName } from "./User";
 
 interface SiteCardProps {
   site: NostrEvent;
@@ -25,9 +29,8 @@ function getManifestDescription(site: NostrEvent): string | undefined {
 
 function getManifestIdentifier(site: NostrEvent): string {
   // For root sites (kind 15128), return "root"
-  if (site.kind === NSITE_ROOT_KIND) {
-    return "root";
-  }
+  if (site.kind === NSITE_ROOT_KIND) return "root";
+
   // For named sites (kind 35128), return the d tag value
   return site.tags.find((t) => t[0] === "d")?.[1] || "unknown";
 }
@@ -49,10 +52,16 @@ export default function SiteCard({
 
   // Memoize the URL to prevent unnecessary re-renders
   const url = useMemo(() => {
-    if (import.meta.env.DEV) return new URL(`https://${npub}.nsite.lol`);
+    // Get the identifier for named sites (d tag value)
+    const identifier = getManifestIdentifier(site);
 
-    return new URL("/", `${location.protocol}//${npub}.${host}`);
-  }, [npub, host]);
+    // For named sites (kind 35128), include identifier as subdomain
+    const subdomain = identifier !== "root" ? `${identifier}.${npub}` : npub;
+
+    if (import.meta.env.DEV) return new URL(`https://${subdomain}.nsite.lol`);
+
+    return new URL("/", `${location.protocol}//${subdomain}.${host}`);
+  }, [npub, host, site]);
 
   const profile = useEventModel(ProfileModel, [site.pubkey]);
   const picture = getProfilePicture(profile);
@@ -96,7 +105,9 @@ export default function SiteCard({
   // Check if site matches search term
   if (searchTerm.trim()) {
     const searchLower = searchTerm.toLowerCase().trim();
-    const manifestTitleMatch = manifestTitle?.toLowerCase().includes(searchLower);
+    const manifestTitleMatch = manifestTitle
+      ?.toLowerCase()
+      .includes(searchLower);
     const manifestDescriptionMatch = manifestDescription
       ?.toLowerCase()
       .includes(searchLower);
@@ -151,9 +162,7 @@ export default function SiteCard({
 
           {/* Site Metadata - Identifier and File Count */}
           <div className="flex items-center gap-3 mb-3 text-xs text-base-content/60 flex-wrap">
-            <div className="badge badge-primary badge-sm">
-              {identifier}
-            </div>
+            <div className="badge badge-outline badge-sm">{identifier}</div>
             <div className="flex items-center gap-1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -169,7 +178,9 @@ export default function SiteCard({
                   d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
                 />
               </svg>
-              <span>{fileCount} file{fileCount !== 1 ? "s" : ""}</span>
+              <span>
+                {fileCount} file{fileCount !== 1 ? "s" : ""}
+              </span>
             </div>
           </div>
 
@@ -178,18 +189,8 @@ export default function SiteCard({
             <div className="flex items-center justify-between text-xs text-base-content/60 gap-2">
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 <span className="shrink-0">Published by</span>
-                {picture && (
-                  <div className="avatar shrink-0">
-                    <div className="w-6 h-6 rounded-full">
-                      <img
-                        src={picture}
-                        alt="Profile avatar"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                )}
-                <span className="font-medium truncate">{displayName}</span>
+                {picture && <UserAvatar user={site.pubkey} size={6} />}
+                <UserName user={site.pubkey} className="font-medium truncate" />
                 {profile?.nip05 && (
                   <span className="text-base-content/40 truncate">
                     ({profile.nip05})
@@ -198,7 +199,8 @@ export default function SiteCard({
               </div>
             </div>
             <div className="text-xs text-base-content/50 italic mt-1">
-              Last updated {new Date(site.created_at * 1000).toLocaleDateString()}
+              Last updated{" "}
+              {new Date(site.created_at * 1000).toLocaleDateString()}
             </div>
           </div>
         </div>

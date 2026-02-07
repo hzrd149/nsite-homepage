@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useObservableState } from "applesauce-react/hooks";
-import { appRelays } from "../settings";
+import { appRelays$ } from "../settings";
 import { DEFAULT_RELAYS } from "../const";
 
 interface SettingsProps {
@@ -102,7 +102,7 @@ function AddRelayForm({
 
 // Main Settings component
 export default function Settings({ isOpen, onClose }: SettingsProps) {
-  const relays = useObservableState(appRelays);
+  const relays = useObservableState(appRelays$);
   const [newRelay, setNewRelay] = useState("");
   const [error, setError] = useState("");
 
@@ -130,17 +130,17 @@ export default function Settings({ isOpen, onClose }: SettingsProps) {
       return;
     }
 
-    appRelays.next([...relays, relay]);
+    appRelays$.next([...relays, relay]);
     setNewRelay("");
     setError("");
   };
 
   const removeRelay = (relayToRemove: string) => {
-    appRelays.next(relays.filter((relay) => relay !== relayToRemove));
+    appRelays$.next(relays.filter((relay) => relay !== relayToRemove));
   };
 
   const resetToDefaults = () => {
-    appRelays.next([...DEFAULT_RELAYS]);
+    appRelays$.next([...DEFAULT_RELAYS]);
     setError("");
   };
 

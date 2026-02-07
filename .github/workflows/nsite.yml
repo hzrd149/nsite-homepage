@@ -29,6 +29,8 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          VITE_RECOMEND_ROOT_PUBKEY: nprofile1qythwumn8ghj7un9d3shjtnswf5k6ctv9ehx2ap0qy88wumn8ghj7mn0wvhxcmmv9uqzqxq9xqw20sdd97f5jpmv72p0jpdnc8j5p6yxwhs5h9v9d3qtwh3n6869fc
 
       - name: Deploy to nsite
         uses: sandwichfarm/nsite-action@v0.2.2
