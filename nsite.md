@@ -1,4 +1,8 @@
-# Static Websites
+# NIP-XX
+
+## Pubkey Static Websites
+
+`draft` `optional`
 
 This nip describes a method by which static websites can be hosted under public keys using specialized host servers
 
@@ -18,6 +22,8 @@ The event MUST include one or more `path` tags that map absolute paths to sha256
 The event MAY include `server` tags that hint at which blossom servers can be used to find the blobs associated with the hashes.
 
 The event MAY include `title` and `description` tags that provide simple site information.
+
+The event MAY include a `source` tag that links to the site's source code repository or source archive. The `source` tag MUST have the format `["source", "<url>"]`, where `<url>` is an absolute `http` or `https` URL.
 
 The site icon SHOULD be provided by setting the `/favicon.ico` path in the manifest.
 
@@ -53,6 +59,8 @@ For example, a root site manifest:
     // optional: site metadata
     ["title", "My Nostr Site"],
     ["description", "A static website hosted on Nostr"],
+    // optional: source code location
+    ["source", "https://github.com/example/my-nostr-site"],
   ],
 }
 ```
@@ -86,6 +94,8 @@ And a named site manifest:
     // optional: site metadata
     ["title", "My Blog"],
     ["description", "A blog hosted on Nostr"],
+    // optional: source code location
+    ["source", "https://github.com/example/my-nostr-blog"],
   ],
 }
 ```
@@ -96,27 +106,42 @@ A host server is a HTTP server that is responsible for serving pubkey static web
 
 #### Resolving Pubkeys
 
-Host servers may choose to resolve a pubkey (and identifier for named sites) however they see fit, NIP-05 ids, `npub` subdomains, hardcoded names, DNS records, or a single pubkey for the server
+For interoperability, host servers SHOULD use the following canonical URL formats:
 
-However it is recommended to use the URL format `[identifier].<npub>.nsite-host.com` where:
+- Root site: `<npub>.nsite-host.com`
+- Named site: `<pubkeyB36><dTag>.nsite-host.com`
 
-- The root site uses `<npub>.nsite-host.com` (no identifier)
-- Named sites use `[identifier].<npub>.nsite-host.com` as subdomains under the npub site
+`pubkeyB36` is the author's raw 32-byte pubkey encoded with base36 (lowercase, digits `0-9` then letters `a-z`, no padding) and is always exactly 50 characters.
 
-This allows the host server to serve all pubkey sites while still keeping the pubkey in the URL, and enables multiple sites per pubkey through identifiers.
+`dTag` is the site identifier (`d` tag value) as plain text. It is appended directly after `pubkeyB36` with no separator.
 
-If the host server is using `npub` subdomains it MAY serve anything at its own root domain `nsite-host.com` ( a landing page for example )
+For canonical named-site URLs, `dTag` MUST match `^[a-z0-9-]{1,13}$` and MUST NOT end with `-`.
+
+Because DNS labels are limited to 63 characters and `pubkeyB36` uses 50 of them, `dTag` MUST be 1-13 characters.
+
+This single-label format avoids wildcard certificate limitations with multi-level subdomains.
+
+If the host server is using subdomain routing it MAY serve anything at its own root domain `nsite-host.com` (a landing page for example).
 
 Example subdomains:
 
 - Root site: `npub10phxfsms72rhafrklqdyhempujs9h67nye0p67qe424dyvcx0dkqgvap0e.nsite-host.com`
-- Named site: `blog.npub10phxfsms72rhafrklqdyhempujs9h67nye0p67qe424dyvcx0dkqgvap0e.nsite-host.com`
+- Named site: `<50-char-pubkeyB36><dTag>.nsite-host.com`
 
 #### Resolving Paths
 
 When the host server receives a request and is able to determine the pubkey and identifier, it should fetch the users `10002` [NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md) relay list and lookup the site manifest event for the pubkey and identifier.
 
-The host server MUST determine the identifier from the request. If no identifier is found in the request, it MUST query for the root site manifest.
+For canonical subdomain formats, the host server MUST parse the left-most DNS label as follows:
+
+1. If the label is a valid `npub`, decode it and query for the root site manifest.
+2. Otherwise, if the label matches `^[0-9a-z]{50}[a-z0-9-]{1,13}$` and does not end with `-`, treat it as a named-site label where:
+   - `pubkeyB36` is the first 50 characters
+   - `dTag` is the remaining 1-13 characters
+   - decode `pubkeyB36` to a 32-byte pubkey
+   - use `dTag` as the identifier (`d` tag value)
+
+If parsing fails, the host server MUST treat the site as not found.
 
 The host server should query for the site manifest event:
 

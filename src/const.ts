@@ -15,10 +15,15 @@ export const DEFUALT_LOOKUP_RELAYS = [
 export const DEFAULT_RELAYS = [
   "wss://relay.damus.io",
   "wss://relay.nsite.lol",
-  "wss://relay.snort.social",
-  "wss://nostr.wine",
   "wss://relay.primal.net",
+  "wss://nsite.run",
 ];
+
+export const NSITE_HOST =
+  import.meta.env.VITE_NSITE_HOST?.trim()
+    .replace(/^https?:\/\//, "")
+    .replace(/\/.*$/, "")
+    .replace(/^\.+|\.+$/g, "") || "nsite.lol";
 
 /** The root pubkey to use for recommend sites */
 export const RECOMEND_ROOT_PUBKEY = import.meta.env.VITE_RECOMEND_ROOT_PUBKEY

@@ -3,12 +3,14 @@
     "wss://relay.damus.io",
     "wss://relay.primal.net",
     "wss://nos.lol",
+    "wss://nsite.run",
     "wss://relay.nsite.lol"
   ],
   "servers": [
     "https://cdn.hzrd149.com",
     "https://nostr.download",
-    "https://blossom.primal.net"
+    "https://blossom.primal.net",
+    "https://nsite.run"
   ],
   "id": null,
   "title": "nsite.lol",
